@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>현재 날씨와 추천</title>
+    <!-- 외부 CSS 파일 불러오기 -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="time-weather">
+            <div class="time" id="current-time">12:30</div>
+            <div class="weather-icon" id="weather-icon">
+                <img src="/static/images/sunny.png" alt="맑음">
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Movie Recommendations</h2>
+            <div class="recommendations" id="movie-recommendations">
+                <!-- 영화 목록 -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Food Recommendations</h2>
+            <div class="recommendations" id="food-recommendations">
+                <!-- 음식 목록 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 실시간 시간 업데이트 함수
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('current-time').textContent = `${hours}:${minutes}`;
+        }
+
+        // 매 분마다 시간 업데이트
+        setInterval(updateTime, 1000);
+
+        // 페이지 로드 후 데이터를 가져옴
+        window.onload = function() {
+            fetch('/api/data')
+                .then(response => response.json())
+                .then(data => {
+                    // 날씨 상태에 맞는 이미지를 설정 (이미지가 static 폴더에 있다고 가정)
+                    const weatherImageMap = {
+                        "맑음": "/static/images/sunny.png",
+                        "구름많음": "/static/images/cloudy.png",
+                        "흐림": "/static/images/overcast.png",
+                        "알 수 없음": "/static/images/unknown.png"
+                    };
+                    document.getElementById('weather-icon').innerHTML = `<img src="${weatherImageMap[data.weather_status]}" alt="${data.weather_status}">`;
+                    
+                    // 영화 추천 리스트 동적으로 추가 (가로 스크롤)
+                    const movieList = document.getElementById('movie-recommendations');
+                    movieList.innerHTML = '';  // 기존 내용 지우기
+                    data.movie_recommendations.forEach(movie => {
+                        let div = document.createElement('div');
+                        div.textContent = movie.title;
+                        movieList.appendChild(div);
+                    });
+
+                    // 음식 추천 리스트 동적으로 추가 (가로 스크롤)
+                    const foodList = document.getElementById('food-recommendations');
+                    foodList.innerHTML = '';  // 기존 내용 지우기
+                    data.food_recommendations.forEach(food => {
+                        let div = document.createElement('div');
+                        div.textContent = food.name;
+                        foodList.appendChild(div);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        };
+    </script>
+</body>
+</html>

@@ -46,7 +46,7 @@ FOOD_RECOMMENDATIONS = {
 
 async def get_movie_recommendations(weather_condition: str):
     # 영화 api 가져오기
-    api_key = "영화 api"
+    api_key = "d4afba9f5b0bf66a17e5b35fc31e8c93"
     api_url = "https://api.themoviedb.org/3/movie/"
 
     # 날씨별로 장르 추천 묶기
